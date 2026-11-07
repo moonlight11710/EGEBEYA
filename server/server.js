@@ -1,4 +1,5 @@
 require('dotenv').config();
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const { connectDB } = require('./config/db');
@@ -42,16 +43,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Root fallback
-app.get('/', (req, res) => {
-  res.send(`GlobalImport REST API is running on port ${PORT}. Check /api/products or /api/health.`);
-});
+// Serve static client build in production
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: `API route not found: ${req.method} ${req.originalUrl}`,
+// SPA Catch-all: serve index.html for React Router DOM (or 404 for missing /api routes)
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({
+      success: false,
+      message: `API route not found: ${req.method} ${req.originalUrl}`,
+    });
+  }
+  const indexPath = path.join(clientDistPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      res.send(`GlobalImport REST API is running on port ${PORT}. Check /api/products or /api/health.`);
+    }
   });
 });
 

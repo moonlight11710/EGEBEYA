@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Import-on-Demand E-Commerce & Sourcing Platform (Node.js + Express + React)",
   "scripts": {
-    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "build": "npm install --prefix server && cd client && npm install && npm run build",
     "start": "node server/server.js",
     "dev": "concurrently -n \"SERVER,CLIENT\" -c \"cyan,magenta\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "server": "npm run dev --prefix server",
